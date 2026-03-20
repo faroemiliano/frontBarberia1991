@@ -38,7 +38,7 @@ function Loader() {
 
 export default function App() {
   const [user, setUser] = useState(getUser());
-  const [showLogin, setShowLogin] = useState(false);
+  const [showLogin, setShowLogin] = useState(!user);
 
   /* 🔒 BLOQUEO SCROLL MODAL */
   useEffect(() => {
@@ -99,9 +99,14 @@ export default function App() {
           <Route
             path="/barbero"
             element={
-              user?.rol === "barbero" ? (
-                <BarberoPanel userId={user!.id} />
+              user ? (
+                user.rol === "barbero" ? (
+                  <BarberoPanel userId={user.id} />
+                ) : (
+                  <Navigate to="/" />
+                )
               ) : (
+                // mostrar login modal en vez de crash
                 <Navigate to="/" />
               )
             }

@@ -116,20 +116,22 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
 
           {openProfesionales && (
             <div className="select-dropdown">
-              {profesionales.map((p) => (
-                <div
-                  key={p.id}
-                  className="select-option"
-                  onClick={() => {
-                    setProfesionalId(p.id);
-                    setHorario(null);
-                    setHorarioConfirmado(false);
-                    setOpenProfesionales(false);
-                  }}
-                >
-                  {p.nombre}
-                </div>
-              ))}
+              {profesionales
+                .filter((p) => p.id !== 2)
+                .map((p) => (
+                  <div
+                    key={p.id}
+                    className="select-option"
+                    onClick={() => {
+                      setProfesionalId(p.id);
+                      setHorario(null);
+                      setHorarioConfirmado(false);
+                      setOpenProfesionales(false);
+                    }}
+                  >
+                    {p.nombre}
+                  </div>
+                ))}
             </div>
           )}
         </div>
