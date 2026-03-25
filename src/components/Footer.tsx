@@ -5,7 +5,7 @@ export default function Footer() {
         <div className="footer-col">
           <h4>Dirección</h4>
           <p>Irigoyen 1138, B1752 La Tablada</p>
-          <p>Buenos Aires, Argentina</p>
+          <p>Buenos Aires, Argentina </p>
         </div>
 
         <div className="footer-col">
