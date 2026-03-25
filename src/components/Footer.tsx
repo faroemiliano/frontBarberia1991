@@ -4,7 +4,7 @@ export default function Footer() {
       <div className="footer-container">
         <div className="footer-col">
           <h4>Dirección</h4>
-          <p>Hipolito Irigoyen 1138, V. insuperable</p>
+          <p>Irigoyen 1138, B1752 La Tablada</p>
           <p>Buenos Aires, Argentina</p>
         </div>
 
