@@ -19,7 +19,7 @@ export default function GoogleLoginButton({
           body: JSON.stringify({ credential }),
         });
 
-        if (!r || !r.ok) return;
+        if (!r.ok) return;
         const data = await r.json();
         console.log("Respuesta backend Google:", data);
 

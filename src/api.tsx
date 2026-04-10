@@ -30,10 +30,10 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    // redirige al login (tu modal o home)
     window.location.href = "/";
-    return;
+    // ❗ NO return acá
   }
 
+  // ✅ SIEMPRE devolver res
   return res;
 }
