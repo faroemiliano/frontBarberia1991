@@ -19,9 +19,9 @@ export default function GoogleLoginButton({
           body: JSON.stringify({ credential }),
         });
 
+        if (!r || !r.ok) return;
         const data = await r.json();
         console.log("Respuesta backend Google:", data);
-        if (!r.ok) return;
 
         saveSession(data.access_token, {
           id: data.user.id,
