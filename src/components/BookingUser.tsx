@@ -58,7 +58,7 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
     setMensaje("");
 
     const token = getToken();
-    if (!token) return setMensaje("Tenés que iniciar sesión");
+    if (!token) return setMensaje("Inicia sesión nuevamente por favor");
     if (!servicio) return setMensaje("Seleccioná un servicio");
     if (!telefono.trim()) return setMensaje("Ingresá tu teléfono");
     if (!horario) return setMensaje("Seleccioná fecha y horario");
