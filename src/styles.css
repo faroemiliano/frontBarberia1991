@@ -428,7 +428,7 @@ section {
 
   /* LOGO CENTRADO Y PROPORCIONAL */
   .hero-logo-bg {
-    top: 40%;
+    top: 10%;
     left: 7=50%;
     transform: translate(-50%, -50%);
     width: clamp(80vh, 80vw, 420px);
