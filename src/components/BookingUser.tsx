@@ -118,9 +118,13 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
               <div className="selected-prof">
                 <img
                   src={
-                    profesionalSeleccionado.foto_url || "/default-avatar.png"
+                    profesionalSeleccionado.foto_url?.trim() ||
+                    "/default-avatar.png"
                   }
                   className="avatar"
+                  onError={(e) => {
+                    e.currentTarget.src = "/default-avatar.png";
+                  }}
                 />
                 <span>{profesionalSeleccionado.nombre}</span>
               </div>
@@ -153,7 +157,7 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
                     }}
                   >
                     <img
-                      src={p.foto_url || "/default-avatar.png"}
+                      src={p.foto_url?.trim() || "/default-avatar.png"}
                       alt={p.nombre.split(" ")[0]}
                       className="avatar"
                     />
