@@ -52,8 +52,8 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
     apiFetch("/profesionales")
       .then((res) => res.json())
       .then((data) => {
-        console.log("PROFESIONALES:", data); // 👈 MIRÁ ESTO
-        setProfesionales(data);
+        const filtrados = data.filter((p: Profesional) => p.id !== 2);
+        setProfesionales(filtrados);
       })
       .catch(() => setMensaje("No se pudieron cargar los profesionales"));
   }, []);
