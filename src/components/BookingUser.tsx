@@ -18,6 +18,7 @@ interface Servicio {
 interface Profesional {
   id: number;
   nombre: string;
+  foto_url?: string;
 }
 
 function parseLocalDate(dateStr: string) {
@@ -100,6 +101,10 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
     }
   }
 
+  const profesionalSeleccionado = profesionales.find(
+    (p) => p.id === profesionalId,
+  );
+
   return (
     <>
       <h2>Reservar turno</h2>
@@ -109,16 +114,34 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
             className="select-trigger"
             onClick={() => setOpenProfesionales(!openProfesionales)}
           >
-            {profesionalId
-              ? profesionales.find((p) => p.id === profesionalId)?.nombre
-              : "Seleccionar profesional"}
+            {profesionalSeleccionado ? (
+              <div className="selected-prof">
+                <img
+                  src={
+                    profesionalSeleccionado.foto_url || "/default-avatar.png"
+                  }
+                  className="avatar"
+                />
+                <span>{profesionalSeleccionado.nombre}</span>
+              </div>
+            ) : (
+              "Seleccionar profesional"
+            )}
           </button>
 
           {openProfesionales && (
             <div className="select-dropdown">
-              {profesionales
-                .filter((p) => p.id !== 2)
-                .map((p) => (
+              {profesionales.map((p) => (
+                <div
+                  key={p.id}
+                  className="select-option"
+                  onClick={() => {
+                    setProfesionalId(p.id);
+                    setHorario(null);
+                    setHorarioConfirmado(false);
+                    setOpenProfesionales(false);
+                  }}
+                >
                   <div
                     key={p.id}
                     className="select-option"
@@ -129,9 +152,15 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
                       setOpenProfesionales(false);
                     }}
                   >
-                    {p.nombre}
+                    <img
+                      src={p.foto_url || "/default-avatar.png"}
+                      alt={p.nombre.split(" ")[0]}
+                      className="avatar"
+                    />
+                    <span>{p.nombre.split(" ")[0]}</span>
                   </div>
-                ))}
+                </div>
+              ))}
             </div>
           )}
         </div>

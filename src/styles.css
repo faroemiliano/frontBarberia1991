@@ -1955,7 +1955,7 @@ section {
   z-index: 100;
 }
 
-.select-option {
+/* .select-option {
   padding: 12px;
   cursor: pointer;
   text-align: center;
@@ -1965,6 +1965,31 @@ section {
 .select-option:hover {
   background: #05cf59;
   color: black;
+} */
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.select-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.select-option:hover {
+  background: #1f1f1f;
+}
+
+.selected-prof {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 /* titulo */
