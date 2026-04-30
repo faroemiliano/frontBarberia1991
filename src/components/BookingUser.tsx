@@ -186,7 +186,8 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
       </div>
 
       <input
-        placeholder="Teléfono"
+        type="tel"
+        placeholder="Ej: 11 5123 4567"
         value={telefono}
         onChange={(e) => setTelefono(e.target.value)}
       />
