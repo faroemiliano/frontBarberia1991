@@ -1,16 +1,29 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import Calendar from "../Calendar";
-import { getUser } from "../../auth";
+import { getToken, getUser } from "../../auth";
+import { useEffect, useState } from "react";
+import RegistroManualModal from "../RegistroManualModal";
+import { apiFetch } from "../../api";
 
 export default function AdminPanel() {
   const navigate = useNavigate();
   const location = useLocation();
-
+  const [servicios, setServicios] = useState([]);
+  const [registroManualOpen, setRegistroManualOpen] = useState(false);
   const user = getUser();
   const barberoId = user?.id;
 
   const isHome = location.pathname === "/admin";
 
+  useEffect(() => {
+    apiFetch("/admin/servicios", {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+      .then((r) => r.json())
+      .then(setServicios);
+  }, []);
   return (
     <section className="admin-panel">
       <h1 className="admin-title">Panel Administrador</h1>
@@ -47,6 +60,13 @@ export default function AdminPanel() {
         >
           Gestionar Usuarios
         </button>
+
+        <button
+          className="btn-secondary"
+          onClick={() => setRegistroManualOpen(true)}
+        >
+          Registrar ingreso manual
+        </button>
       </div>
 
       {/* PAGINA INICIO */}
@@ -68,6 +88,14 @@ export default function AdminPanel() {
           <hr />
           <Outlet />
         </>
+      )}
+
+      {registroManualOpen && (
+        <RegistroManualModal
+          servicios={servicios}
+          onClose={() => setRegistroManualOpen(false)}
+          onSuccess={() => window.location.reload()}
+        />
       )}
     </section>
   );
