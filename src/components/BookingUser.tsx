@@ -106,13 +106,16 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
         return;
       }
 
-      const updatedUser = {
-        ...user,
-        telefono: telefonoFinal,
-      };
+      // ✅ Actualizar localStorage con el teléfono guardado
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-      setUser(updatedUser);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          ...user,
+          telefono: data.telefono,
+        }),
+      );
 
       setSuccessOpen(true);
       setTelefono("");

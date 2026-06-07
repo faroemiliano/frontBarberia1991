@@ -28,6 +28,7 @@ export default function GoogleLoginButton({
           email: data.user.email,
           nombre: data.user.nombre,
           rol: data.user.rol, // 🔥 conversión correcta
+          telefono: data.user.telefono,
         });
         onSuccess();
       }}

@@ -7,6 +7,7 @@ export function saveSession(
     email: string;
     nombre?: string;
     rol: "admin" | "barbero" | "cliente";
+    telefono?: string;
   },
 ) {
   localStorage.setItem("token", token);
@@ -17,6 +18,7 @@ export function saveSession(
       email: user.email,
       nombre: user.nombre || "",
       rol: user.rol,
+      telefono: user.telefono || "",
     }),
   );
 }
@@ -30,6 +32,7 @@ export function getUser(): {
   email: string;
   nombre: string;
   rol: "admin" | "barbero" | "cliente";
+  telefono: string;
 } | null {
   const raw = localStorage.getItem("user");
 
