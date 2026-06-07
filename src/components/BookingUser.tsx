@@ -40,13 +40,14 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
   const [profesionalId, setProfesionalId] = useState<number | null>(null);
   const [openProfesionales, setOpenProfesionales] = useState(false);
 
-  const [user, setUser] = useState<any>(() => {
+  const user = (() => {
     try {
       return JSON.parse(localStorage.getItem("user") || "null");
     } catch {
       return null;
     }
-  });
+  })();
+
   const telefonoGuardado = user?.telefono;
 
   /* CARGAR SERVICIOS */
