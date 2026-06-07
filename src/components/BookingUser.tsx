@@ -40,7 +40,16 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
   const [profesionalId, setProfesionalId] = useState<number | null>(null);
   const [openProfesionales, setOpenProfesionales] = useState(false);
 
-  /* CARGAR SERVICIOS DESDE BACKEND */
+  const [user, setUser] = useState<any>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user") || "null");
+    } catch {
+      return null;
+    }
+  });
+  const telefonoGuardado = user?.telefono;
+
+  /* CARGAR SERVICIOS */
   useEffect(() => {
     apiFetch("/admin/servicios")
       .then((res) => res.json())
@@ -48,6 +57,7 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
       .catch(() => setMensaje("No se pudieron cargar los servicios"));
   }, []);
 
+  /* CARGAR PROFESIONALES */
   useEffect(() => {
     apiFetch("/profesionales")
       .then((res) => res.json())
@@ -62,9 +72,14 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
     setMensaje("");
 
     const token = getToken();
-    if (!token) return setMensaje("Inicia sesión nuevamente por favor");
+    const telefonoFinal = telefonoGuardado || telefono;
+
+    if (!token) return setMensaje("Inicia sesión nuevamente");
     if (!servicio) return setMensaje("Seleccioná un servicio");
-    if (!telefono.trim()) return setMensaje("Ingresá tu teléfono");
+
+    // 👇 FIX CLAVE: solo validar si NO existe guardado
+    if (!telefonoFinal?.trim()) return setMensaje("Ingresá tu teléfono");
+
     if (!horario) return setMensaje("Seleccioná fecha y horario");
     if (!profesionalId) return setMensaje("Seleccioná un profesional");
 
@@ -78,7 +93,7 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          telefono,
+          telefono: telefonoFinal,
           servicio_id: servicio.id,
           horario_id: horario.id,
         }),
@@ -90,6 +105,14 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
         setMensaje(data?.detail || "Error al reservar");
         return;
       }
+
+      const updatedUser = {
+        ...user,
+        telefono: telefonoFinal,
+      };
+
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      setUser(updatedUser);
 
       setSuccessOpen(true);
       setTelefono("");
@@ -111,6 +134,8 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
   return (
     <>
       <h2>Reservar turno</h2>
+
+      {/* PROFESIONAL */}
       <div className="select-wrapper">
         <div className="custom-select">
           <button
@@ -125,9 +150,6 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
                     "/default-avatar.png"
                   }
                   className="avatar"
-                  onError={(e) => {
-                    e.currentTarget.src = "/default-avatar.png";
-                  }}
                 />
                 <span>{profesionalSeleccionado.nombre}</span>
               </div>
@@ -149,23 +171,11 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
                     setOpenProfesionales(false);
                   }}
                 >
-                  <div
-                    key={p.id}
-                    className="select-option"
-                    onClick={() => {
-                      setProfesionalId(p.id);
-                      setHorario(null);
-                      setHorarioConfirmado(false);
-                      setOpenProfesionales(false);
-                    }}
-                  >
-                    <img
-                      src={p.foto_url?.trim() || "/default-avatar.png"}
-                      alt={p.nombre.split(" ")[0]}
-                      className="avatar"
-                    />
-                    <span>{p.nombre.split(" ")[0]}</span>
-                  </div>
+                  <img
+                    src={p.foto_url?.trim() || "/default-avatar.png"}
+                    className="avatar"
+                  />
+                  <span>{p.nombre.split(" ")[0]}</span>
                 </div>
               ))}
             </div>
@@ -173,6 +183,7 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
         </div>
       </div>
 
+      {/* SERVICIOS */}
       <div className="services-grid">
         {servicios.map((s) => (
           <button
@@ -185,13 +196,19 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
         ))}
       </div>
 
-      <input
-        type="tel"
-        placeholder="Ej: 11 5123 4567"
-        value={telefono}
-        onChange={(e) => setTelefono(e.target.value)}
-      />
+      {/* TELEFONO */}
+      {!telefonoGuardado ? (
+        <input
+          type="tel"
+          placeholder="Ej: 11 5123 4567"
+          value={telefono}
+          onChange={(e) => setTelefono(e.target.value)}
+        />
+      ) : (
+        <p className="telefono-guardado">📱: {telefonoGuardado}</p>
+      )}
 
+      {/* CALENDARIO */}
       {profesionalId !== null && !horarioConfirmado && (
         <Calendar
           barberoId={profesionalId}
@@ -203,6 +220,7 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
         />
       )}
 
+      {/* RESUMEN */}
       {horarioConfirmado && horario && servicio && (
         <div className="resume-box">
           <p>
@@ -223,18 +241,20 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
         </div>
       )}
 
+      {/* MENSAJE */}
       {mensaje && <p className="modal-msg">{mensaje}</p>}
 
+      {/* CONFIRMAR */}
       {horarioConfirmado && (
         <button className="confirm" disabled={loading} onClick={reservar}>
           {loading ? "Reservando..." : "Confirmar reserva"}
         </button>
       )}
 
+      {/* SUCCESS */}
       {successOpen && (
         <div className="success">
           <h2>¡Reserva confirmada! 🎉</h2>
-          <p>Te enviamos la confirmación a tu email 📩</p>
 
           <button
             className="cta"

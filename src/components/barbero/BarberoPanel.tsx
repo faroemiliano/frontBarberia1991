@@ -20,6 +20,7 @@ interface Turno {
   horario_id: number;
   servicio: string;
   servicio_id: number;
+  barbero_id: number;
   precio: number;
 }
 
@@ -62,7 +63,8 @@ export default function BarberoPanel({}: Props) {
   const [modalMesOpen, setModalMesOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [vista, setVista] = useState<"inicio" | "gestiones">("inicio");
-
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const barberoId = user?.id;
   const hoyLocal = () => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
@@ -165,7 +167,7 @@ export default function BarberoPanel({}: Props) {
         <div className="admin-agenda">
           <h2 className="agenda-title">Agenda</h2>
 
-          <Calendar mode="barbero" />
+          <Calendar mode="barbero" barberoId={barberoId} />
         </div>
       )}
 
@@ -306,7 +308,7 @@ export default function BarberoPanel({}: Props) {
         <div className="modal-overlay">
           <div className="modal-box large">
             <h2>Bloquear / Desbloquear horarios</h2>
-            <Calendar mode="barbero" />
+            <Calendar mode="barbero" barberoId={barberoId} />
             <div className="modal-actions">
               <button
                 className="btn-secondary"
@@ -402,6 +404,7 @@ export default function BarberoPanel({}: Props) {
             telefono: turnoEditando.telefono,
             servicio_id: turnoEditando.servicio_id,
             precio: turnoEditando.precio,
+            barbero_id: turnoEditando.barbero_id,
             horario: {
               id: turnoEditando.horario_id,
               fecha: turnoEditando.fecha,

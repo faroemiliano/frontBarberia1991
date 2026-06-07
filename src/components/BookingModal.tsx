@@ -18,12 +18,13 @@ interface BookingModalProps {
   open: boolean;
   onClose: () => void;
   modo: "crear" | "editar";
-  soloHorarioYServicio?: boolean; // 🔥 CORRECTO
+  soloHorarioYServicio?: boolean;
   turnoInicial?: {
     telefono: string;
     servicio_id: number;
     precio: number;
     horario: HorarioSeleccionado | null;
+    barbero_id?: number;
   };
   onSubmit: (data: {
     telefono: string;
@@ -49,26 +50,39 @@ export default function BookingModal({
   const [editandoHorario, setEditandoHorario] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const barberoId = turnoInicial?.barbero_id ?? null;
+  console.log("BARBERO ID EN MODAL:", barberoId);
   useEffect(() => {
     apiFetch("/admin/servicios")
       .then((res) => res.json())
-      .then((data) => setServicios(data));
+      .then((data) => {
+        console.log("🟦 SERVICIOS CARGADOS:", data);
+        setServicios(data);
+      });
   }, []);
 
   useEffect(() => {
     if (!open) return;
 
+    console.log("🟢 MODAL OPEN");
+    console.log("➡️ turnoInicial:", turnoInicial);
+    console.log("➡️ servicios actuales:", servicios);
+
     if (turnoInicial) {
       setTelefono(turnoInicial.telefono);
       setPrecio(turnoInicial.precio ?? 0);
       setHorario(turnoInicial.horario);
-
       const servicioEncontrado = servicios.find(
         (s) => s.id === turnoInicial.servicio_id,
       );
 
+      console.log("🟡 SERVICIO MATCH:", servicioEncontrado);
+
       setServicio(servicioEncontrado ?? null);
+
+      console.log("🟣 BARBERO ID SET:", turnoInicial.barbero_id);
     } else {
+      console.log("⚠️ NO HAY TURNO INICIAL (modo crear)");
       setTelefono("");
       setServicio(null);
       setPrecio(0);
@@ -79,7 +93,14 @@ export default function BookingModal({
   if (!open) return null;
 
   async function handleSubmit() {
-    if (!horario || !servicio) return;
+    console.log("🟢 SUBMIT CLICKED");
+    console.log("➡️ horario:", horario);
+    console.log("➡️ servicio:", servicio);
+
+    if (!horario || !servicio) {
+      console.log("❌ FALTA HORARIO O SERVICIO");
+      return;
+    }
 
     setLoading(true);
 
@@ -87,7 +108,7 @@ export default function BookingModal({
       telefono,
       servicio_id: servicio.id,
       precio,
-      horario,
+      horario: horario!,
     });
 
     setLoading(false);
@@ -110,6 +131,7 @@ export default function BookingModal({
               type="button"
               className={`service-card ${servicio?.id === s.id ? "active" : ""}`}
               onClick={() => {
+                console.log("🟡 SERVICIO CLICK:", s);
                 setServicio(s);
                 setPrecio(s.precio);
               }}
@@ -123,7 +145,10 @@ export default function BookingModal({
           placeholder="Teléfono"
           value={telefono}
           disabled={soloHorarioYServicio}
-          onChange={(e) => setTelefono(e.target.value)}
+          onChange={(e) => {
+            console.log("📞 TEL:", e.target.value);
+            setTelefono(e.target.value);
+          }}
         />
 
         <input
@@ -132,27 +157,31 @@ export default function BookingModal({
           min={0}
           value={precio}
           disabled={soloHorarioYServicio}
-          onChange={(e) =>
-            setPrecio(e.target.value === "" ? 0 : Number(e.target.value))
-          }
+          onChange={(e) => {
+            console.log("💰 PRECIO:", e.target.value);
+            setPrecio(e.target.value === "" ? 0 : Number(e.target.value));
+          }}
         />
 
         {horario && !editandoHorario && (
           <>
             <div className="horario-resumen">
-              <p>
-                Fecha: {horario.fecha}
-                <br />
-                Hora: {horario.hora}
-              </p>
+              <div>
+                <p>
+                  📅 {horario?.fecha} <br />
+                  🕒 {horario?.hora}
+                </p>
+              </div>
 
-              <button
+              {/* <button
                 type="button"
                 className="btn-secondary"
-                onClick={() => setEditandoHorario(true)}
+                onClick={() => {
+                  setEditandoHorario(true);
+                }}
               >
                 Cambiar día y hora
-              </button>
+              </button> */}
             </div>
 
             <button
@@ -171,8 +200,10 @@ export default function BookingModal({
 
         {editandoHorario && (
           <Calendar
-            onConfirm={(nuevoHorario) => {
-              setHorario(nuevoHorario);
+            mode="admin"
+            barberoId={barberoId ?? undefined}
+            onConfirm={(h) => {
+              setHorario(h);
               setEditandoHorario(false);
             }}
           />

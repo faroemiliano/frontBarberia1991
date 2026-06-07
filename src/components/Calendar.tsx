@@ -72,7 +72,13 @@ export default function Calendar({
 
   useEffect(() => {
     async function cargarHorarios() {
-      if (mode !== "barbero" && !barberoId) {
+      // 👇 BLOQUEO TOTAL ANTES DE PEGARLE AL BACK
+      if (mode === "admin" && !barberoId) {
+        setLoading(false);
+        return;
+      }
+
+      if (mode === "barbero" && !barberoId) {
         setLoading(false);
         return;
       }
@@ -80,29 +86,38 @@ export default function Calendar({
       setLoading(true);
 
       try {
-        let token = localStorage.getItem("token");
-        let headers: Record<string, string> | undefined;
-
-        if (token && (mode === "admin" || mode === "barbero")) {
-          headers = { Authorization: `Bearer ${token}` };
-        }
+        const token = localStorage.getItem("token");
+        const headers =
+          token && (mode === "admin" || mode === "barbero")
+            ? { Authorization: `Bearer ${token}` }
+            : undefined;
 
         let path = "";
 
         if (mode === "admin") {
+          if (!barberoId) {
+            throw new Error("Falta barberoId en modo admin");
+          }
           path = `/admin/calendario-admin/${barberoId}`;
         } else if (mode === "barbero") {
-          path = "/barbero/horarios";
+          path = `/barbero/horarios`;
         } else {
-          path = `/calendario/${barberoId}`;
+          path = `/calendario/${barberoId ?? ""}`;
         }
 
+        console.log("📌 MODE:", mode);
+        console.log("📌 BARBERO ID:", barberoId);
+        console.log("📌 PATH:", path);
+
         const res = await apiFetch(path, { headers });
-        if (!res.ok) throw new Error("Error cargando horarios");
+
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("❌ BACKEND ERROR:", text);
+          throw new Error("Error cargando horarios");
+        }
 
         const data: Horario[] = await res.json();
-
-        if (!Array.isArray(data)) throw new Error("Datos inválidos");
 
         setHorarios(data);
 
@@ -118,7 +133,10 @@ export default function Calendar({
           indexHoy !== -1 ? uniqueDays[indexHoy] : (uniqueDays[0] ?? null),
         );
       } catch (err) {
-        console.error(err);
+        console.error("❌ Calendar error:", err);
+        setHorarios([]);
+        setDias([]);
+        setDiaActivo(null);
       } finally {
         setLoading(false);
       }
@@ -137,6 +155,10 @@ export default function Calendar({
   const hayDisponibles = horarios.some((h) => h.disponible);
 
   if (loading) return <p>Cargando horarios...</p>;
+
+  if (!loading && dias.length === 0) {
+    return <p>No se pudieron cargar los horarios</p>;
+  }
 
   if (!loading && !hayDisponibles && mode === "user") {
     return (

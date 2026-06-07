@@ -15,6 +15,7 @@ interface Turno {
   precio: number;
   horario_id: number;
   barbero: string;
+  barbero_id?: number;
 }
 
 interface Barbero {
@@ -214,7 +215,7 @@ export default function AdminPanel() {
             }
 
             payload.servicio_id = servicio_id;
-
+            console.log("PAYLOAD EDIT:", payload);
             const res = await apiFetch(`/admin/turnos/${turnoId}`, {
               method: "PATCH",
               headers: {
