@@ -70,6 +70,7 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
   }, []);
 
   async function reservar() {
+    if (loading) return;
     setMensaje("");
 
     const token = getToken();
@@ -100,13 +101,26 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
         }),
       });
 
-      const data = await res.json();
+      let data = null;
+
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
+      }
+
+      if (res.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+
+        setMensaje("Tu sesión expiró. Iniciá sesión nuevamente.");
+        return;
+      }
 
       if (!res.ok) {
         setMensaje(data?.detail || "Error al reservar");
         return;
       }
-
       // ✅ Actualizar localStorage con el teléfono guardado
       const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -114,7 +128,7 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
         "user",
         JSON.stringify({
           ...user,
-          telefono: data.telefono,
+          telefono: data?.telefono || telefonoFinal,
         }),
       );
 
@@ -124,7 +138,8 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
       setHorario(null);
       setHorarioConfirmado(false);
       setMensaje("");
-    } catch {
+    } catch (error) {
+      console.error("Error reserva:", error);
       setMensaje("No se pudo conectar con el servidor");
     } finally {
       setLoading(false);
