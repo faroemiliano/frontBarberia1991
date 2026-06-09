@@ -47,7 +47,7 @@ export default function Hero({ user, onLogin }: Props) {
         )}
 
         {/* LOGUEADO */}
-        {user && !user.is_admin && (
+        {user && user.rol !== "admin" && (
           <div className="hero-actions">
             <button
               className="btn-secondary "

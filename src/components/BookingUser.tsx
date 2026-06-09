@@ -136,7 +136,7 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
   );
 
   return (
-    <>
+    <div className="booking-user-container">
       <h2>Reservar turno</h2>
 
       {/* PROFESIONAL */}
@@ -271,6 +271,6 @@ export default function BookingUser({ onClose }: { onClose: () => void }) {
           </button>
         </div>
       )}
-    </>
+    </div>
   );
 }

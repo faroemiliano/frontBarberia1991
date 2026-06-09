@@ -1,3 +1,5 @@
+/* @import "tailwindcss"; */
+
 /* =====================
    BASE
 ===================== */
@@ -18,7 +20,31 @@ body {
   background: #020617;
 }
 
-/* =====================
+.booking-user-container {
+  width: 100%;
+  max-width: 850px; /* antes seguramente ocupa demasiado */
+  margin: 0 auto;
+  padding: 1rem;
+  transform: scale(0.92);
+  transform-origin: top center;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .booking-user-container {
+    max-width: 700px;
+    transform: scale(0.96);
+  }
+}
+
+/* Celular */
+@media (max-width: 768px) {
+  .booking-user-container {
+    max-width: 100%;
+    transform: scale(1);
+    padding: 0.8rem;
+  }
+} /* =====================
    SECTIONS
 ===================== */
 section {
