@@ -1039,6 +1039,7 @@ section {
   background: white;
   cursor: pointer;
   font-weight: 600;
+  margin-top: 10px;
 }
 
 .day-card.active,
