@@ -1033,9 +1033,9 @@ section {
 
 .day-card,
 .hour-card {
-  padding: 4px;
-  border-radius: 14px;
-  border: 2px solid #ddd;
+  padding: 0px;
+  border-radius: 10px;
+  border: 4px solid #ddd;
   background: white;
   cursor: pointer;
   font-weight: 600;
