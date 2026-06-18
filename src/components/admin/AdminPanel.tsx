@@ -10,8 +10,8 @@ export default function AdminPanel() {
   const location = useLocation();
   const [servicios, setServicios] = useState([]);
   const [registroManualOpen, setRegistroManualOpen] = useState(false);
-  const user = getUser();
-  const barberoId = user?.id;
+
+  const barberoId = undefined;
 
   const isHome = location.pathname === "/admin";
 

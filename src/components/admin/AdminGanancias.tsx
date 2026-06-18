@@ -23,6 +23,11 @@ interface DetalleTurno {
   nombre: string;
   servicio: string;
   precio: number;
+
+  admin_propia: number;
+  admin_alquiler: number;
+
+  barbero: number;
 }
 
 /* =====================
@@ -49,17 +54,47 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 function ModalTotalMes({
   total,
+  gananciaAdminPropia,
+  gananciaAdminAlquiler,
+  gananciaAdminTotal,
+  gananciaBarberos,
   onClose,
 }: {
   total: number;
+  gananciaAdminPropia: number;
+  gananciaAdminAlquiler: number;
+  gananciaAdminTotal: number;
+  gananciaBarberos: number;
   onClose: () => void;
 }) {
   return (
     <div className="modal-overlay">
       <div className="modal-box">
-        <h3>Total del mes</h3>
+        <h3>Resumen del mes</h3>
 
-        <p className="modal-total">${total.toLocaleString("es-AR")}</p>
+        <p>
+          <b>Facturación total:</b>${total.toLocaleString("es-AR")}
+        </p>
+
+        <p>
+          <b>Trabajos realizados por mí:</b>$
+          {gananciaAdminPropia.toLocaleString("es-AR")}
+        </p>
+
+        <p>
+          <b>Ingreso por alquiler (40%):</b>$
+          {gananciaAdminAlquiler.toLocaleString("es-AR")}
+        </p>
+
+        <p>
+          <b>Ganancia total admin:</b>$
+          {gananciaAdminTotal.toLocaleString("es-AR")}
+        </p>
+
+        <p>
+          <b>Ganancia del barberos:</b>$
+          {gananciaBarberos.toLocaleString("es-AR")}
+        </p>
 
         <button className="btn-secondary" onClick={onClose}>
           Cerrar
@@ -97,6 +132,14 @@ function ModalDetalle({
   /* TOTAL DEL DIA */
   const total = data.reduce((acc, t) => acc + t.precio, 0);
 
+  const totalAdminPropia = data.reduce((acc, t) => acc + t.admin_propia, 0);
+
+  const totalAdminAlquiler = data.reduce((acc, t) => acc + t.admin_alquiler, 0);
+
+  const totalAdmin = totalAdminPropia + totalAdminAlquiler;
+
+  const totalBarberos = data.reduce((acc, t) => acc + t.barbero, 0);
+
   return (
     <div className="modal-overlay">
       <div className="modal-box large">
@@ -132,7 +175,24 @@ function ModalDetalle({
               </div>
 
               <div className="modal-detalle-total">
-                Total: ${total.toLocaleString("es-AR")}
+                Facturación total: ${total.toLocaleString("es-AR")}
+              </div>
+              <div className="modal-detalle-total">
+                Trabajos realizados por mí: $
+                {totalAdminPropia.toLocaleString("es-AR")}
+              </div>
+
+              <div className="modal-detalle-total">
+                Ingresos por alquiler: $
+                {totalAdminAlquiler.toLocaleString("es-AR")}
+              </div>
+
+              <div className="modal-detalle-total">
+                Ganancia total admin: ${totalAdmin.toLocaleString("es-AR")}
+              </div>
+
+              <div className="modal-detalle-total">
+                Ganancia barberos: ${totalBarberos.toLocaleString("es-AR")}
               </div>
             </>
           )}
@@ -163,6 +223,13 @@ function GraficoPie({
 }) {
   const [data, setData] = useState<GananciaServicio[]>([]);
   const [total, setTotal] = useState(0);
+  const [gananciaAdminPropia, setGananciaAdminPropia] = useState(0);
+
+  const [gananciaAdminAlquiler, setGananciaAdminAlquiler] = useState(0);
+
+  const [gananciaAdminTotal, setGananciaAdminTotal] = useState(0);
+
+  const [gananciaBarberos, setGananciaBarberos] = useState(0);
   const [modalDetalleOpen, setModalDetalleOpen] = useState(false);
   const [modalMesOpen, setModalMesOpen] = useState(false);
 
@@ -195,7 +262,15 @@ function GraficoPie({
     const totalJson = await totalRes.json();
 
     setData(graficoJson);
-    setTotal(totalJson.total || 0);
+    setTotal(totalJson.facturacion_total || 0);
+
+    setGananciaAdminPropia(totalJson.ganancia_admin_propia || 0);
+
+    setGananciaAdminAlquiler(totalJson.ganancia_admin_alquiler || 0);
+
+    setGananciaAdminTotal(totalJson.ganancia_admin_total || 0);
+
+    setGananciaBarberos(totalJson.ganancia_barberos || 0);
   };
   /* ===== useEffect que depende directamente de fecha y tipo ===== */
   useEffect(() => {
@@ -221,7 +296,9 @@ function GraficoPie({
 
   return (
     <div className="grafico-wrapper">
-      <h3 className="grafico-title">{tipo === "dia" ? "Día" : "Mes"}</h3>
+      <h3 className="grafico-title">
+        {tipo === "dia" ? "Ganancias del Día" : "Ganancias del Mes"}
+      </h3>
 
       {/* navegación día */}
       {tipo === "dia" && (
@@ -270,6 +347,27 @@ function GraficoPie({
           </PieChart>
         </ResponsiveContainer>
       </div>
+      <div className="resumen-ganancia">
+        <p>Facturación total: ${total.toLocaleString("es-AR")}</p>
+
+        <p>
+          Trabajos realizados por mí: $
+          {gananciaAdminPropia.toLocaleString("es-AR")}
+        </p>
+
+        <p>
+          Ingreso por alquiler (40%): $
+          {gananciaAdminAlquiler.toLocaleString("es-AR")}
+        </p>
+
+        <p>
+          Ganancia total admin: ${gananciaAdminTotal.toLocaleString("es-AR")}
+        </p>
+
+        <p>
+          Ganancia barberos (60%): ${gananciaBarberos.toLocaleString("es-AR")}
+        </p>
+      </div>
 
       {/* MODALES */}
       {modalDetalleOpen && tipo === "dia" && (
@@ -280,7 +378,14 @@ function GraficoPie({
       )}
 
       {modalMesOpen && tipo === "mes" && (
-        <ModalTotalMes total={total} onClose={() => setModalMesOpen(false)} />
+        <ModalTotalMes
+          total={total}
+          gananciaAdminPropia={gananciaAdminPropia}
+          gananciaAdminAlquiler={gananciaAdminAlquiler}
+          gananciaAdminTotal={gananciaAdminTotal}
+          gananciaBarberos={gananciaBarberos}
+          onClose={() => setModalMesOpen(false)}
+        />
       )}
     </div>
   );

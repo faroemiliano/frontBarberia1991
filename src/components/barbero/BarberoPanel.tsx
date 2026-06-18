@@ -10,6 +10,7 @@ import {
 import Calendar from "../Calendar";
 import BookingModal from "../BookingModal";
 import { apiFetch } from "../../api";
+import RegistroManualModal from "../RegistroManualModal";
 
 interface Turno {
   id: number;
@@ -26,12 +27,22 @@ interface Turno {
 
 interface PanelData {
   turnos: Turno[];
-  dinero_diario: number;
-  dinero_mensual: number;
+
+  facturado_diario: number;
+  ganancia_diaria: number;
+
+  facturado_mensual: number;
+  ganancia_mensual: number;
 }
 
 interface Props {
   userId: number;
+}
+
+interface Servicio {
+  id: number;
+  nombre: string;
+  precio: number;
 }
 
 function isoToLocalDate(fechaISO: string) {
@@ -62,6 +73,8 @@ export default function BarberoPanel({}: Props) {
   const [modalGraficoOpen, setModalGraficoOpen] = useState(false);
   const [modalMesOpen, setModalMesOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [registroManualOpen, setRegistroManualOpen] = useState(false);
+  const [servicios, setServicios] = useState<Servicio[]>([]);
   const [vista, setVista] = useState<"inicio" | "gestiones">("inicio");
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const barberoId = user?.id;
@@ -91,14 +104,48 @@ export default function BarberoPanel({}: Props) {
   };
 
   useEffect(() => {
+    const cargarServicios = async () => {
+      try {
+        const res = await apiFetch("/admin/servicios", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+
+        console.log("SERVICIOS:", data);
+
+        if (Array.isArray(data)) {
+          setServicios(data);
+        }
+      } catch (err) {
+        console.error("Error cargando servicios:", err);
+      }
+    };
+
+    cargarServicios();
+  }, [token]);
+
+  useEffect(() => {
     fetchPanel();
   }, []);
 
   const cancelarTurno = async (id: number) => {
-    await apiFetch(`/barbero/turnos/${id}`, {
+    const confirmar = window.confirm("¿Seguro que deseas cancelar este turno?");
+
+    if (!confirmar) return;
+
+    const res = await apiFetch(`/barbero/turnos/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
+
+    if (!res.ok) {
+      alert("No se pudo cancelar el turno");
+      return;
+    }
+
     fetchPanel();
   };
 
@@ -110,36 +157,35 @@ export default function BarberoPanel({}: Props) {
     return fechaTurno === fechaSeleccionada;
   });
 
-  const gananciaDelDia = turnosFiltrados.reduce(
-    (acc, turno) => acc + turno.precio,
-    0,
-  );
+  const facturacionDia = data.facturado_diario;
+  const barberoDia = data.ganancia_diaria;
+  const adminDia = facturacionDia - barberoDia;
 
-  const fechaObj = new Date(fechaSeleccionada);
-
-  const gananciaDelMesSeleccionado = data.turnos
-    .filter((t) => {
-      const fechaTurno = new Date(t.fecha);
-      return (
-        fechaTurno.getMonth() === fechaObj.getMonth() &&
-        fechaTurno.getFullYear() === fechaObj.getFullYear()
-      );
-    })
-    .reduce((acc, turno) => acc + turno.precio, 0);
+  const facturacionMes = data.facturado_mensual;
+  const barberoMes = data.ganancia_mensual;
+  const adminMes = facturacionMes - barberoMes;
 
   const esHoy = fechaSeleccionada === hoyLocal();
 
   const graficoDia = [
     {
-      name: esHoy ? "Hoy" : fechaSeleccionada,
-      value: gananciaDelDia,
+      name: "Admin",
+      value: adminDia,
+    },
+    {
+      name: "Mi ganancia",
+      value: barberoDia,
     },
   ];
 
   const graficoMes = [
     {
-      name: "Mes",
-      value: gananciaDelMesSeleccionado,
+      name: "Admin",
+      value: adminMes,
+    },
+    {
+      name: "Mi ganancia",
+      value: barberoMes,
     },
   ];
 
@@ -158,6 +204,12 @@ export default function BarberoPanel({}: Props) {
             onClick={() => setVista("gestiones")}
           >
             Gestiones
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() => setRegistroManualOpen(true)}
+          >
+            Registrar ingreso manual
           </button>
         </div>
       </div>
@@ -255,7 +307,7 @@ export default function BarberoPanel({}: Props) {
           <div className="graficos-container">
             <div className="grafico-box">
               <h3>
-                {esHoy ? "Ganancia Hoy" : `Ganancia ${fechaSeleccionada}`}
+                {esHoy ? "Mi Ganancia Hoy" : `Mi Ganancia ${fechaSeleccionada}`}
               </h3>
 
               <ResponsiveContainer width="100%" height={280}>
@@ -269,6 +321,7 @@ export default function BarberoPanel({}: Props) {
                     outerRadius={85}
                     onClick={() => setModalGraficoOpen(true)}
                   >
+                    <Cell fill="#ff9800" />
                     <Cell fill="#00c853" />
                   </Pie>
 
@@ -276,10 +329,15 @@ export default function BarberoPanel({}: Props) {
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
+              <div className="resumen-ganancia">
+                <p>Facturado: ${facturacionDia.toLocaleString("es-AR")}</p>
+                <p>Alquiler (40%): ${adminDia.toLocaleString("es-AR")}</p>
+                <p>Mi ganancia (60%): ${barberoDia.toLocaleString("es-AR")}</p>
+              </div>
             </div>
 
             <div className="grafico-box">
-              <h3>Ganancia del Mes</h3>
+              <h3>Mi Ganancia del Mes</h3>
 
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
@@ -293,12 +351,18 @@ export default function BarberoPanel({}: Props) {
                     onClick={() => setModalMesOpen(true)}
                   >
                     <Cell fill="#2962ff" />
+                    <Cell fill="#00c853" />
                   </Pie>
 
                   <Tooltip />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
+              <div className="resumen-ganancia">
+                <p>Facturado: ${facturacionMes.toLocaleString("es-AR")}</p>
+                <p>Alquiler (40%): ${adminMes.toLocaleString("es-AR")}</p>
+                <p>Mi ganancia (60%): ${barberoMes.toLocaleString("es-AR")}</p>
+              </div>
             </div>
           </div>
         </>
@@ -348,10 +412,28 @@ export default function BarberoPanel({}: Props) {
               <tfoot>
                 <tr>
                   <td colSpan={2}>
-                    <b>Total</b>
+                    <b>Facturado</b>
                   </td>
                   <td>
-                    <b>${gananciaDelDia}</b>
+                    <b>${facturacionDia}</b>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td colSpan={2}>
+                    <b>Debe entregar (40%)</b>
+                  </td>
+                  <td>
+                    <b>${adminDia}</b>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td colSpan={2}>
+                    <b>Le corresponde (60%)</b>
+                  </td>
+                  <td>
+                    <b>${barberoDia}</b>
                   </td>
                 </tr>
               </tfoot>
@@ -372,17 +454,32 @@ export default function BarberoPanel({}: Props) {
       {modalMesOpen && (
         <div className="modal-overlay">
           <div className="modal-box">
-            <h2>Ganancia total del mes</h2>
+            <h2>Resumen del mes</h2>
 
-            <div
-              style={{
-                textAlign: "center",
-                fontSize: "28px",
-                margin: "20px 0",
-              }}
-            >
-              ${gananciaDelMesSeleccionado}
-            </div>
+            <table className="turnos-table">
+              <tbody>
+                <tr>
+                  <td>
+                    <b>Facturado</b>
+                  </td>
+                  <td>${facturacionMes.toLocaleString("es-AR")}</td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <b>Debe entregar (40%)</b>
+                  </td>
+                  <td>${adminMes.toLocaleString("es-AR")}</td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <b>Le corresponde (60%)</b>
+                  </td>
+                  <td>${barberoMes.toLocaleString("es-AR")}</td>
+                </tr>
+              </tbody>
+            </table>
 
             <div className="modal-actions">
               <button
@@ -440,6 +537,17 @@ export default function BarberoPanel({}: Props) {
 
             fetchPanel();
             setTurnoEditando(null);
+          }}
+        />
+      )}
+
+      {registroManualOpen && servicios.length > 0 && (
+        <RegistroManualModal
+          servicios={servicios}
+          onClose={() => setRegistroManualOpen(false)}
+          onSuccess={() => {
+            fetchPanel();
+            setRegistroManualOpen(false);
           }}
         />
       )}

@@ -165,20 +165,7 @@ export default function Calendar({
     return fechaHorario > ahora;
   });
 
-  const hayDisponibles = horarios.some((h) => {
-    if (!h.disponible) return false;
-
-    if (mode !== "user") return true;
-
-    const ahora = new Date();
-
-    const [y, m, d] = h.fecha.split("-").map(Number);
-    const [hh, mm] = h.hora.split(":").map(Number);
-
-    const fechaHorario = new Date(y, m - 1, d, hh, mm);
-
-    return fechaHorario > ahora;
-  });
+  const hayDisponibles = horarios.some((h) => h.disponible);
 
   if (loading) return <p>Cargando horarios...</p>;
 
