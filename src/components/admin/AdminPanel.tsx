@@ -1,6 +1,6 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import Calendar from "../Calendar";
-import { getToken, getUser } from "../../auth";
+import { getToken } from "../../auth";
 import { useEffect, useState } from "react";
 import RegistroManualModal from "../RegistroManualModal";
 import { apiFetch } from "../../api";
