@@ -10,8 +10,8 @@ export default function AdminPanel() {
   const location = useLocation();
   const [servicios, setServicios] = useState([]);
   const [registroManualOpen, setRegistroManualOpen] = useState(false);
-
-  const barberoId = undefined;
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  // const barberoId = undefined;
 
   const isHome = location.pathname === "/admin";
 
@@ -77,7 +77,7 @@ export default function AdminPanel() {
           <div className="admin-agenda">
             <h2 className="agenda-title">Turnos de Hoy</h2>
 
-            {barberoId && <Calendar mode="admin" barberoId={barberoId} />}
+            <Calendar mode="admin" barberoId={user?.id} />
           </div>
         </>
       )}

@@ -308,7 +308,9 @@ export default function AdminPanel() {
             </select>
 
             {/* Calendar recibe barberoId */}
-            <Calendar mode="admin" barberoId={barberoActivo} />
+            {calendarOpen && barberoActivo && (
+              <Calendar mode="admin" barberoId={barberoActivo} />
+            )}
 
             <div className="modal-actions">
               <button

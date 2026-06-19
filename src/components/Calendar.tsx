@@ -45,7 +45,14 @@ export default function Calendar({
     try {
       const token = localStorage.getItem("token");
       if (!token) return;
-
+      console.log("📡 TOGGLE INFO", {
+        mode,
+        barberoId,
+        endpoint:
+          mode === "admin"
+            ? `/admin/horarios/${h.id}/toggle`
+            : `/barbero/horarios/${h.id}/toggle`,
+      });
       const res = await apiFetch(
         mode === "admin"
           ? `/admin/horarios/${h.id}/toggle`
@@ -72,13 +79,16 @@ export default function Calendar({
 
   useEffect(() => {
     async function cargarHorarios() {
+      console.log("🚀 USEEFFECT CALENDAR", { mode, barberoId });
       // 👇 BLOQUEO TOTAL ANTES DE PEGARLE AL BACK
       if (mode === "admin" && !barberoId) {
+        console.log("⛔ BLOQUEADO ADMIN SIN ID");
         setLoading(false);
         return;
       }
 
       if (mode === "barbero" && !barberoId) {
+        console.log("⛔ BLOQUEADO BARBERO SIN ID");
         setLoading(false);
         return;
       }
@@ -118,10 +128,12 @@ export default function Calendar({
         }
 
         const data: Horario[] = await res.json();
-
+        console.log("📦 HORARIOS RAW:", data);
+        console.log("📦 HORARIOS LENGTH:", data.length);
         setHorarios(data);
 
         const uniqueDays = Array.from(new Set(data.map((h) => h.fecha))).sort();
+        console.log("📅 UNIQUE DAYS:", uniqueDays);
         setDias(uniqueDays);
 
         const hoy = todayISO();
@@ -185,7 +197,7 @@ export default function Calendar({
       </div>
     );
   }
-
+  console.log("🧠 CALENDAR RENDER", { mode, barberoId });
   return (
     <>
       <div className="week-nav">
