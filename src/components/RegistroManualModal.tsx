@@ -24,6 +24,11 @@ export default function RegistroManualModal({
   const [precio, setPrecio] = useState("");
   const [observaciones, setObservaciones] = useState("");
 
+  const hoy = new Date().toISOString().split("T")[0];
+
+  const [fecha, setFecha] = useState(hoy);
+  const [hora, setHora] = useState("");
+
   const guardar = async () => {
     try {
       const res = await apiFetch("/admin/registros-manuales", {
@@ -37,6 +42,8 @@ export default function RegistroManualModal({
           servicio_id: Number(servicioId),
           precio: Number(precio),
           observaciones,
+          fecha,
+          hora,
         }),
       });
 
@@ -100,6 +107,26 @@ export default function RegistroManualModal({
         <div className="modal-section">
           <label>Precio</label>
           <input className="auth-input" type="number" value={precio} readOnly />
+        </div>
+
+        <div className="modal-section">
+          <label>Fecha</label>
+          <input
+            className="auth-input"
+            type="date"
+            value={fecha}
+            onChange={(e) => setFecha(e.target.value)}
+          />
+        </div>
+
+        <div className="modal-section">
+          <label>Hora</label>
+          <input
+            className="auth-input"
+            type="time"
+            value={hora}
+            onChange={(e) => setHora(e.target.value)}
+          />
         </div>
 
         <div className="modal-section">
