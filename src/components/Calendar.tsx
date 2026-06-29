@@ -6,6 +6,7 @@ interface Horario {
   fecha: string;
   hora: string;
   disponible: boolean;
+  barbero_id?: number;
 }
 
 interface Props {
@@ -33,6 +34,9 @@ export default function Calendar({
   barberoId,
 }: Props) {
   const [horarios, setHorarios] = useState<Horario[]>([]);
+
+  const horariosFiltrados = horarios;
+
   const [dias, setDias] = useState<string[]>([]);
   const [diaActivo, setDiaActivo] = useState<string | null>(null);
   const [horarioActivo, setHorarioActivo] = useState<Horario | null>(null);
@@ -128,22 +132,42 @@ export default function Calendar({
         }
 
         const data: Horario[] = await res.json();
-        console.log("📦 HORARIOS RAW:", data);
-        console.log("📦 HORARIOS LENGTH:", data.length);
+
+        console.log("🧨 RAW SAMPLE:", data[0]);
+
         setHorarios(data);
 
-        const uniqueDays = Array.from(new Set(data.map((h) => h.fecha))).sort();
-        console.log("📅 UNIQUE DAYS:", uniqueDays);
-        setDias(uniqueDays);
+        // 🔥 SIEMPRE trabajar con DATA, nunca con state
+        const cleanedDays = Array.from(
+          new Set(data.map((h) => h.fecha).filter(Boolean)),
+        ).sort((a, b) => {
+          const [ay, am, ad] = a.split("-").map(Number);
+          const [by, bm, bd] = b.split("-").map(Number);
 
-        const hoy = todayISO();
-        const indexHoy = uniqueDays.findIndex((d) => d >= hoy);
+          return (
+            new Date(ay, am - 1, ad).getTime() -
+            new Date(by, bm - 1, bd).getTime()
+          );
+        });
 
-        setPage(indexHoy !== -1 ? Math.floor(indexHoy / DIAS_POR_PAGINA) : 0);
+        setDias(cleanedDays);
 
-        setDiaActivo(
-          indexHoy !== -1 ? uniqueDays[indexHoy] : (uniqueDays[0] ?? null),
-        );
+        // hoy como Date real
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+
+        const todayIndex = cleanedDays.findIndex((d) => {
+          const [y, m, day] = d.split("-").map(Number);
+          const date = new Date(y, m - 1, day);
+          date.setHours(0, 0, 0, 0);
+          return date >= now;
+        });
+
+        const nextIndex =
+          todayIndex !== -1 ? todayIndex - (todayIndex % DIAS_POR_PAGINA) : 0;
+
+        setPage(Math.floor(nextIndex / DIAS_POR_PAGINA));
+        setDiaActivo(cleanedDays[nextIndex] ?? null);
       } catch (err) {
         console.error("❌ Calendar error:", err);
         setHorarios([]);
@@ -162,13 +186,12 @@ export default function Calendar({
 
   const diasVisibles = dias.slice(inicio, fin);
 
-  const horariosDelDia = horarios.filter((h) => {
+  const horariosDelDia = horariosFiltrados.filter((h) => {
     if (h.fecha !== diaActivo) return false;
 
     if (mode !== "user") return true;
 
     const ahora = new Date();
-
     const [y, m, d] = h.fecha.split("-").map(Number);
     const [hh, mm] = h.hora.split(":").map(Number);
 
@@ -177,7 +200,7 @@ export default function Calendar({
     return fechaHorario > ahora;
   });
 
-  const hayDisponibles = horarios.some((h) => h.disponible);
+  const hayDisponibles = horariosFiltrados.some((h) => h.disponible);
 
   if (loading) return <p>Cargando horarios...</p>;
 
