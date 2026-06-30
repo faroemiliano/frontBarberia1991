@@ -150,16 +150,15 @@ export default function Calendar({
 
         const todayIndex = cleanedDays.findIndex((d) => {
           const [y, m, day] = d.split("-").map(Number);
-          const date = new Date(y, m - 1, day);
-          date.setHours(0, 0, 0, 0);
-          return date >= now;
+          const fecha = new Date(y, m - 1, day);
+          fecha.setHours(0, 0, 0, 0);
+          return fecha >= now;
         });
 
-        const nextIndex =
-          todayIndex !== -1 ? todayIndex - (todayIndex % DIAS_POR_PAGINA) : 0;
+        const selectedIndex = todayIndex !== -1 ? todayIndex : 0;
 
-        setPage(Math.floor(nextIndex / DIAS_POR_PAGINA));
-        setDiaActivo(cleanedDays[nextIndex] ?? null);
+        setPage(Math.floor(selectedIndex / DIAS_POR_PAGINA));
+        setDiaActivo(cleanedDays[selectedIndex] ?? null);
       } catch (err) {
         console.error("❌ Calendar error:", err);
         setHorarios([]);

@@ -56,14 +56,14 @@ function ModalTotalMes({
   total,
   gananciaAdminPropia,
   gananciaAdminAlquiler,
-  gananciaAdminTotal,
+
   gananciaBarberos,
   onClose,
 }: {
   total: number;
   gananciaAdminPropia: number;
   gananciaAdminAlquiler: number;
-  gananciaAdminTotal: number;
+
   gananciaBarberos: number;
   onClose: () => void;
 }) {
@@ -84,11 +84,6 @@ function ModalTotalMes({
         <p>
           <b>Ingreso por alquiler (40%):</b>$
           {gananciaAdminAlquiler.toLocaleString("es-AR")}
-        </p>
-
-        <p>
-          <b>Ganancia total admin:</b>$
-          {gananciaAdminTotal.toLocaleString("es-AR")}
         </p>
 
         <p>
@@ -135,8 +130,6 @@ function ModalDetalle({
   const totalAdminPropia = data.reduce((acc, t) => acc + t.admin_propia, 0);
 
   const totalAdminAlquiler = data.reduce((acc, t) => acc + t.admin_alquiler, 0);
-
-  const totalAdmin = totalAdminPropia + totalAdminAlquiler;
 
   const totalBarberos = data.reduce((acc, t) => acc + t.barbero, 0);
 
@@ -188,10 +181,6 @@ function ModalDetalle({
               </div>
 
               <div className="modal-detalle-total">
-                Ganancia total admin: ${totalAdmin.toLocaleString("es-AR")}
-              </div>
-
-              <div className="modal-detalle-total">
                 Ganancia barberos: ${totalBarberos.toLocaleString("es-AR")}
               </div>
             </>
@@ -227,8 +216,6 @@ function GraficoPie({
 
   const [gananciaAdminAlquiler, setGananciaAdminAlquiler] = useState(0);
 
-  const [gananciaAdminTotal, setGananciaAdminTotal] = useState(0);
-
   const [gananciaBarberos, setGananciaBarberos] = useState(0);
   const [modalDetalleOpen, setModalDetalleOpen] = useState(false);
   const [modalMesOpen, setModalMesOpen] = useState(false);
@@ -260,6 +247,7 @@ function GraficoPie({
 
     const graficoJson: GananciaServicio[] = await graficoRes.json();
     const totalJson = await totalRes.json();
+    console.log(totalJson);
 
     setData(graficoJson);
     setTotal(totalJson.facturacion_total || 0);
@@ -267,8 +255,6 @@ function GraficoPie({
     setGananciaAdminPropia(totalJson.ganancia_admin_propia || 0);
 
     setGananciaAdminAlquiler(totalJson.ganancia_admin_alquiler || 0);
-
-    setGananciaAdminTotal(totalJson.ganancia_admin_total || 0);
 
     setGananciaBarberos(totalJson.ganancia_barberos || 0);
   };
@@ -361,10 +347,6 @@ function GraficoPie({
         </p>
 
         <p>
-          Ganancia total admin: ${gananciaAdminTotal.toLocaleString("es-AR")}
-        </p>
-
-        <p>
           Ganancia barberos (60%): ${gananciaBarberos.toLocaleString("es-AR")}
         </p>
       </div>
@@ -382,7 +364,6 @@ function GraficoPie({
           total={total}
           gananciaAdminPropia={gananciaAdminPropia}
           gananciaAdminAlquiler={gananciaAdminAlquiler}
-          gananciaAdminTotal={gananciaAdminTotal}
           gananciaBarberos={gananciaBarberos}
           onClose={() => setModalMesOpen(false)}
         />
