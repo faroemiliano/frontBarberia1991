@@ -251,13 +251,15 @@ export default function Calendar({
                 setHorarioActivo(null);
               }}
             >
-              <span className="day-name">
+              <span className="day-name" translate="no">
                 {date.toLocaleDateString("es-AR", { weekday: "short" })}
               </span>
 
-              <span className="day-number">{date.getDate()}</span>
+              <span className="day-number" translate="no">
+                {date.getDate()}
+              </span>
 
-              <span className="day-month">
+              <span className="day-month" translate="no">
                 {date.toLocaleDateString("es-AR", { month: "short" })}
               </span>
             </button>
