@@ -7,7 +7,7 @@ interface Props {
 export default function Booking({ onClose }: Props) {
   return (
     <div className="modal-overlay">
-      <div className="modal-box">
+      <div className="modal-box booking-modal">
         <button className="modal-close" onClick={onClose}>
           ✕
         </button>

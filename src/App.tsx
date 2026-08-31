@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Modal from "./components/Modal";
 import { getUser, logout } from "./auth";
+import whatsappLogo from "./assets/logos/logoWhats.png";
 
 // 🔥 Lazy loaded pages/components
 const Hero = lazy(() => import("./components/Hero"));
@@ -128,6 +129,16 @@ export default function App() {
           </Suspense>
         </Modal>
       )}
+
+      <a
+        className="whatsapp-float"
+        href="https://wa.me/5491122384585"
+        target="_blank"
+        rel="noreferrer"
+        aria-label="Contactar por WhatsApp al 11 2238-4585"
+      >
+        <img src={whatsappLogo} alt="" />
+      </a>
     </>
   );
 }

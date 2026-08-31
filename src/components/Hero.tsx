@@ -6,9 +6,10 @@ import locationLogo from "../assets/logos/logoUbi.png";
 import instagramLogo from "../assets/logos/logoInsta.png";
 import whatsappLogo from "../assets/logos/logoWhats.png";
 import fondo from "../assets/fondoPantalla.png";
+import type { SessionUser } from "../auth";
 
 interface Props {
-  user: any;
+  user: SessionUser | null;
   onLogin: () => void;
 }
 
@@ -18,53 +19,59 @@ export default function Hero({ user, onLogin }: Props) {
 
   return (
     <section className="hero" style={{ backgroundImage: `url(${fondo})` }}>
-      <img src={logoTitulo} alt="Barbería 1991" className="hero-logo-bg" />
+      <div className="hero-glow" aria-hidden="true" />
 
       <div className="hero-main">
-        {/* ICONOS */}
-        <div className="hero-icons">
-          <a href="https://maps.app.goo.gl/cESJbAGczdZVZnL7A" target="_blank">
-            <img src={locationLogo} />
+        <div className="hero-copy">
+          <span className="hero-eyebrow">La Tablada · Buenos Aires</span>
+          <h1>Tu estilo, <em>bien definido.</em></h1>
+          <p>
+            Barbería clásica con mirada actual. Cortes, barba y color hechos con
+            oficio, detalle y tiempo para vos.
+          </p>
+        </div>
+
+        <div className="hero-actions">
+          {!user && (
+            <button className="cta hero-primary" onClick={onLogin}>
+              Reservar un turno
+            </button>
+          )}
+
+          {user && user.rol !== "admin" && (
+            <>
+              <button className="cta hero-primary" onClick={() => setOpenBooking(true)}>
+                Reservar turno
+              </button>
+              <button className="btn-secondary" onClick={() => setMisTurnos(true)}>
+                Ver mis turnos
+              </button>
+            </>
+          )}
+        </div>
+
+        <div className="hero-socials" aria-label="Encontranos en">
+          <span>Encontranos</span>
+          <div className="hero-icons">
+          <a href="https://maps.app.goo.gl/cESJbAGczdZVZnL7A" target="_blank" rel="noreferrer" aria-label="Ver ubicación en Google Maps">
+            <img src={locationLogo} alt="" />
           </a>
           <a
             href="https://www.instagram.com/1991.barberia?igsh=MXE3YzVwaTAyZ2l3Zw=="
             target="_blank"
+            rel="noreferrer"
+            aria-label="Visitar Instagram"
           >
-            <img src={instagramLogo} />
+            <img src={instagramLogo} alt="" />
           </a>
-          <a href="https://wa.me/5491122384585" target="_blank">
-            <img src={whatsappLogo} />
+          <a href="https://wa.me/5491122384585" target="_blank" rel="noreferrer" aria-label="Escribir por WhatsApp">
+            <img src={whatsappLogo} alt="" />
           </a>
+          </div>
         </div>
-
-        {/* NO LOGUEADO */}
-        {!user && (
-          <div className="hero-login">
-            <button className="btn-secondary" onClick={onLogin}>
-              Para sacar turno Iniciar sesión
-            </button>
-          </div>
-        )}
-
-        {/* LOGUEADO */}
-        {user && user.rol !== "admin" && (
-          <div className="hero-actions">
-            <button
-              className="btn-secondary "
-              onClick={() => setOpenBooking(true)}
-            >
-              Reservar turno
-            </button>
-
-            <button
-              className="btn-secondary"
-              onClick={() => setMisTurnos(true)}
-            >
-              Mis turnos
-            </button>
-          </div>
-        )}
       </div>
+
+      <img src={logoTitulo} alt="Barbería 1991" className="hero-logo-bg" />
 
       {/* MODALES */}
       {openBooking && (

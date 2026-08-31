@@ -1,5 +1,13 @@
 // auth.ts (o donde manejes la sesión)
 
+export interface SessionUser {
+  id: number;
+  email: string;
+  nombre: string;
+  rol: "admin" | "barbero" | "cliente";
+  telefono: string;
+}
+
 export function saveSession(
   token: string,
   user: {
@@ -27,13 +35,7 @@ export function getToken() {
   return localStorage.getItem("token");
 }
 
-export function getUser(): {
-  id: number;
-  email: string;
-  nombre: string;
-  rol: "admin" | "barbero" | "cliente";
-  telefono: string;
-} | null {
+export function getUser(): SessionUser | null {
   const raw = localStorage.getItem("user");
 
   if (!raw) return null;

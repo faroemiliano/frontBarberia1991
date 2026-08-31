@@ -1,7 +1,12 @@
 export default function CutsGallery() {
   return (
-    <section className="cuts">
+    <section className="cuts" id="trabajos">
       <div className="cuts-content">
+        <header className="section-heading">
+          <span className="section-kicker">Nuestro trabajo</span>
+          <h2>Precisión en cada detalle</h2>
+          <p>Estilos pensados para acompañarte dentro y fuera de la barbería.</p>
+        </header>
         <div className="cuts-grid">
           <div className="cut-card">
             <video
@@ -11,7 +16,7 @@ export default function CutsGallery() {
               loop
               playsInline
             />
-            <span>Cuidado de barba</span>
+            <span><small>01</small>Cuidado de barba</span>
           </div>
 
           <div className="cut-card">
@@ -22,7 +27,7 @@ export default function CutsGallery() {
               loop
               playsInline
             />
-            <span>Fade y barba</span>
+            <span><small>02</small>Fade y barba</span>
           </div>
 
           <div className="cut-card">
@@ -33,7 +38,7 @@ export default function CutsGallery() {
               loop
               playsInline
             />
-            <span>Corte y mechas</span>
+            <span><small>03</small>Corte y mechas</span>
           </div>
 
           <div className="cut-card">
@@ -44,7 +49,7 @@ export default function CutsGallery() {
               loop
               playsInline
             />
-            <span>Corte y tintura global</span>
+            <span><small>04</small>Corte y tintura global</span>
           </div>
         </div>
       </div>

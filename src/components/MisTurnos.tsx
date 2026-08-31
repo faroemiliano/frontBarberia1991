@@ -69,7 +69,7 @@ export default function MisTurnos({ onClose }: { onClose: () => void }) {
     .slice(0, 3);
   return (
     <div className="modal-form-overlay">
-      <div className="modal-form-content admin-card">
+      <div className="modal-form-content admin-card mis-turnos-modal">
         <h2 className="modal-title">Mis turnos</h2>
         {mensaje && <p className="modal-message error">{mensaje}</p>}
         {turnos.length === 0 && (

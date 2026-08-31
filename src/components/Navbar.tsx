@@ -1,7 +1,8 @@
 import logoBarberia1991 from "../assets/fondo1.jpeg";
+import type { SessionUser } from "../auth";
 
 interface Props {
-  user: any;
+  user: SessionUser | null;
   onLogin: () => void;
   onLogout: () => void;
 }
@@ -9,23 +10,24 @@ interface Props {
 export default function Navbar({ user, onLogin, onLogout }: Props) {
   return (
     <header className="navbar">
-      {/* LOGO */}
-      <div className="navbar-logo-wrapper">
+      <a className="navbar-logo-wrapper" href="/" aria-label="Ir al inicio">
         <img
           src={logoBarberia1991}
           alt="Barbería 1991"
           className="navbar-logo"
         />
-      </div>
+      </a>
 
-      {/* ACCIONES */}
       <nav className="navbar-actions">
+        <a className="navbar-link" href="#contacto">
+          Contacto
+        </a>
         {!user ? (
-          <button className="btn-secondary" onClick={onLogin}>
-            Login
+          <button className="btn-secondary navbar-button" onClick={onLogin}>
+            Iniciar sesión
           </button>
         ) : (
-          <button className="btn-secondary" onClick={onLogout}>
+          <button className="btn-secondary navbar-button" onClick={onLogout}>
             Salir
           </button>
         )}
