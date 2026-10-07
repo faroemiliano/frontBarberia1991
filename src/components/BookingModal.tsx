@@ -53,7 +53,7 @@ export default function BookingModal({
   const barberoId = turnoInicial?.barbero_id ?? null;
   console.log("BARBERO ID EN MODAL:", barberoId);
   useEffect(() => {
-    apiFetch("/admin/servicios")
+    apiFetch("/servicios")
       .then((res) => res.json())
       .then((data) => {
         console.log("🟦 SERVICIOS CARGADOS:", data);

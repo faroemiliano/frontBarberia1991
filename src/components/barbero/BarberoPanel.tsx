@@ -106,11 +106,7 @@ export default function BarberoPanel({}: Props) {
   useEffect(() => {
     const cargarServicios = async () => {
       try {
-        const res = await apiFetch("/admin/servicios", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await apiFetch("/servicios");
 
         const data = await res.json();
 
