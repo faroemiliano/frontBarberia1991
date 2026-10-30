@@ -2870,6 +2870,22 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .cut-card-corte-tintura {
+    order: 1;
+  }
+
+  .cut-card-cuidado-barba {
+    order: 2;
+  }
+
+  .cut-card-fade-barba {
+    order: 3;
+  }
+
+  .cut-card-corte-mechas {
+    order: 4;
+  }
+
   .cut-card,
   .cut-card video {
     min-height: 460px;
