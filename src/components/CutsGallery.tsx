@@ -10,7 +10,7 @@ export default function CutsGallery() {
         <div className="cuts-grid">
           <div className="cut-card">
             <video
-              src="https://res.cloudinary.com/dnsxvwfoc/video/upload/v1770838550/corte1_nztjrt.mp4"
+              src="https://pub-24e04f446a1e451db8b43838c8597cc7.r2.dev/WhatsApp%20Video%202026-01-21%20at%2019.04.51.mp4"
               autoPlay
               muted
               loop
@@ -21,7 +21,7 @@ export default function CutsGallery() {
 
           <div className="cut-card">
             <video
-              src="https://res.cloudinary.com/dnsxvwfoc/video/upload/v1770838550/corte2_zrwczp.mp4"
+              src="https://pub-24e04f446a1e451db8b43838c8597cc7.r2.dev/WhatsApp%20Video%202026-01-28%20at%2021.51.43.mp4"
               autoPlay
               muted
               loop
@@ -32,7 +32,7 @@ export default function CutsGallery() {
 
           <div className="cut-card">
             <video
-              src="https://res.cloudinary.com/dnsxvwfoc/video/upload/v1770838550/corte4_a9vtbk.mp4"
+              src="https://pub-24e04f446a1e451db8b43838c8597cc7.r2.dev/WhatsApp%20Video%202026-01-28%20at%2021.58.18.mp4"
               autoPlay
               muted
               loop
@@ -43,7 +43,7 @@ export default function CutsGallery() {
 
           <div className="cut-card">
             <video
-              src="https://res.cloudinary.com/dnsxvwfoc/video/upload/v1770838551/corte3_ra82rn.mp4"
+              src="https://pub-24e04f446a1e451db8b43838c8597cc7.r2.dev/WhatsApp%20Video%202026-01-28%20at%2022.00.12.mp4"
               autoPlay
               muted
               loop
