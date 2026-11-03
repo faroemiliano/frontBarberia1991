@@ -75,7 +75,7 @@ export default function BarberoPanel({}: Props) {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [registroManualOpen, setRegistroManualOpen] = useState(false);
   const [servicios, setServicios] = useState<Servicio[]>([]);
-  const [vista, setVista] = useState<"inicio" | "gestiones">("inicio");
+  const [vista, setVista] = useState<"inicio" | "gestiones">("gestiones");
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const barberoId = user?.id;
   const hoyLocal = () => {
@@ -86,7 +86,7 @@ export default function BarberoPanel({}: Props) {
     )}-${String(d.getDate()).padStart(2, "0")}`;
   };
 
-  const [fechaSeleccionada, setFechaSeleccionada] = useState(hoyLocal());
+  const [fechaSeleccionada, setFechaSeleccionada] = useState<string | null>(null);
   const token = localStorage.getItem("token");
 
   const fetchPanel = async () => {
@@ -148,10 +148,12 @@ export default function BarberoPanel({}: Props) {
   if (loading) return <div className="panel-loading">Cargando...</div>;
   if (!data) return <div>Error</div>;
 
-  const turnosFiltrados = data.turnos.filter((t) => {
-    const fechaTurno = t.fecha.split("T")[0];
-    return fechaTurno === fechaSeleccionada;
-  });
+  const turnosFiltrados = [...data.turnos]
+    .sort((a, b) => `${a.fecha}T${a.hora}`.localeCompare(`${b.fecha}T${b.hora}`))
+    .filter((t) => {
+      if (!fechaSeleccionada) return true;
+      return t.fecha.split("T")[0] === fechaSeleccionada;
+    });
 
   const facturacionDia = data.facturado_diario;
   const barberoDia = data.ganancia_diaria;
@@ -161,7 +163,7 @@ export default function BarberoPanel({}: Props) {
   const barberoMes = data.ganancia_mensual;
   const adminMes = facturacionMes - barberoMes;
 
-  const esHoy = fechaSeleccionada === hoyLocal();
+  const esHoy = !fechaSeleccionada || fechaSeleccionada === hoyLocal();
 
   const graficoDia = [
     {
@@ -227,20 +229,38 @@ export default function BarberoPanel({}: Props) {
               <button
                 className="btn-secondary"
                 onClick={() =>
-                  setFechaSeleccionada(moverDiaISO(fechaSeleccionada, -1))
+                  setFechaSeleccionada(
+                    moverDiaISO(fechaSeleccionada ?? hoyLocal(), -1),
+                  )
                 }
               >
                 Día anterior
               </button>
 
               <span className="admin-day-label">
-                {isoToDMY(fechaSeleccionada)}
+                {fechaSeleccionada ? isoToDMY(fechaSeleccionada) : "Todos los turnos"}
               </span>
 
               <button
                 className="btn-secondary"
+                onClick={() => setFechaSeleccionada(hoyLocal())}
+              >
+                Hoy
+              </button>
+
+              <button
+                className="btn-secondary"
+                onClick={() => setFechaSeleccionada(null)}
+              >
+                Ver todos
+              </button>
+
+              <button
+                className="btn-secondary"
                 onClick={() =>
-                  setFechaSeleccionada(moverDiaISO(fechaSeleccionada, 1))
+                  setFechaSeleccionada(
+                    moverDiaISO(fechaSeleccionada ?? hoyLocal(), 1),
+                  )
                 }
               >
                 Día siguiente
@@ -262,7 +282,13 @@ export default function BarberoPanel({}: Props) {
                 </thead>
 
                 <tbody>
-                  {turnosFiltrados.map((turno) => (
+                  {turnosFiltrados.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="admin-table-empty">
+                        No hay turnos para la fecha seleccionada.
+                      </td>
+                    </tr>
+                  ) : turnosFiltrados.map((turno) => (
                     <tr key={turno.id}>
                       <td data-label="Cliente">{turno.cliente}</td>
                       <td data-label="Telefono">{turno.telefono}</td>
