@@ -16,6 +16,7 @@ interface Turno {
   horario_id: number;
   barbero: string;
   barbero_id?: number;
+  cantidad_cortes: number;
 }
 
 interface Barbero {
@@ -155,6 +156,7 @@ export default function AdminPanel() {
                 <th>Hora</th>
                 <th>Servicio</th>
                 <th>Barbero</th>
+                <th>N.º de cortes</th>
                 <th>Precio</th>
                 <th>Acciones</th>
               </tr>
@@ -163,7 +165,7 @@ export default function AdminPanel() {
             <tbody>
               {turnosDelDia.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="admin-table-empty">
+                  <td colSpan={9} className="admin-table-empty">
                     No hay turnos para la fecha seleccionada.
                   </td>
                 </tr>
@@ -175,6 +177,7 @@ export default function AdminPanel() {
                   <td data-label="Hora">{t.hora}</td>
                   <td data-label="Servicio">{t.servicio}</td>
                   <td data-label="Barbero">{t.barbero}</td>
+                  <td data-label="N.º de cortes">{t.cantidad_cortes}</td>
                   <td data-label="Precio">${t.precio.toFixed(2)}</td>
                   <td data-label="Acciones" className="admin-actions">
                     <button

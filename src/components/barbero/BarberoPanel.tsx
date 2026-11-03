@@ -23,6 +23,7 @@ interface Turno {
   servicio_id: number;
   barbero_id: number;
   precio: number;
+  cantidad_cortes: number;
 }
 
 interface PanelData {
@@ -276,6 +277,7 @@ export default function BarberoPanel({}: Props) {
                     <th>Fecha</th>
                     <th>Hora</th>
                     <th>Servicio</th>
+                    <th>N.º de cortes</th>
                     <th>Precio</th>
                     <th>Acciones</th>
                   </tr>
@@ -284,7 +286,7 @@ export default function BarberoPanel({}: Props) {
                 <tbody>
                   {turnosFiltrados.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="admin-table-empty">
+                      <td colSpan={8} className="admin-table-empty">
                         No hay turnos para la fecha seleccionada.
                       </td>
                     </tr>
@@ -295,6 +297,7 @@ export default function BarberoPanel({}: Props) {
                       <td data-label="Fecha">{turno.fecha}</td>
                       <td data-label="Hora">{turno.hora}</td>
                       <td data-label="Servicio">{turno.servicio}</td>
+                      <td data-label="N.º de cortes">{turno.cantidad_cortes}</td>
                       <td data-label="Precio">${turno.precio}</td>
 
                       <td>
