@@ -60,13 +60,15 @@ export default function AdminPanel() {
   const [turnoAEliminar, setTurnoAEliminar] = useState<Turno | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
 
-  const [diaActivo, setDiaActivo] = useState(fechaLocalISO());
+  const [diaActivo, setDiaActivo] = useState<string | null>(null);
 
   const [barberos, setBarberos] = useState<Barbero[]>([]);
   const [barberoActivo, setBarberoActivo] = useState<number | null>(null);
 
   const turnosDelDia = useMemo(() => {
-    return turnos.filter((t) => t.fecha === diaActivo);
+    return [...turnos]
+      .sort((a, b) => `${a.fecha}T${a.hora}`.localeCompare(`${b.fecha}T${b.hora}`))
+      .filter((t) => !diaActivo || t.fecha === diaActivo);
   }, [turnos, diaActivo]);
 
   const cargarTurnos = async () => {
@@ -115,24 +117,33 @@ export default function AdminPanel() {
         <div className="admin-day-nav">
           <button
             className="btn-secondary"
-            onClick={() => setDiaActivo(moverDiaISO(diaActivo, -1))}
+            onClick={() => setDiaActivo(moverDiaISO(diaActivo ?? fechaLocalISO(), -1))}
           >
             Día anterior
           </button>
 
-          <span className="admin-day-label">{isoToDMY(diaActivo)}</span>
+          <span className="admin-day-label">
+            {diaActivo ? isoToDMY(diaActivo) : "Todos los turnos"}
+          </span>
 
           <button
             className="btn-secondary"
-            onClick={() => setDiaActivo(moverDiaISO(diaActivo, 1))}
+            onClick={() => setDiaActivo(fechaLocalISO())}
+          >
+            Hoy
+          </button>
+
+          <button className="btn-secondary" onClick={() => setDiaActivo(null)}>
+            Ver todos
+          </button>
+
+          <button
+            className="btn-secondary"
+            onClick={() => setDiaActivo(moverDiaISO(diaActivo ?? fechaLocalISO(), 1))}
           >
             Día siguiente
           </button>
         </div>
-
-        {turnosDelDia.length === 0 && (
-          <p className="no-turnos">No hay turnos para este día</p>
-        )}
 
         <div className="admin-turnos-scroll">
           <table className="admin-table">
@@ -150,7 +161,13 @@ export default function AdminPanel() {
             </thead>
 
             <tbody>
-              {turnosDelDia.map((t) => (
+              {turnosDelDia.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="admin-table-empty">
+                    No hay turnos para la fecha seleccionada.
+                  </td>
+                </tr>
+              ) : turnosDelDia.map((t) => (
                 <tr key={t.id}>
                   <td data-label="Cliente">{t.nombre}</td>
                   <td data-label="Teléfono">{t.telefono}</td>
