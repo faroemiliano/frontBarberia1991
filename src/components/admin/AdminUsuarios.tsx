@@ -7,6 +7,7 @@ interface Usuario {
   email: string;
   rol: string;
   activo: boolean;
+  acepta_reservas: boolean;
 }
 
 type FiltroEstado = "todos" | "activos" | "inactivos";
@@ -18,6 +19,7 @@ export default function AdminUsuarios() {
   const [busqueda, setBusqueda] = useState("");
   const [filtroEstado, setFiltroEstado] = useState<FiltroEstado>("todos");
   const [actualizandoId, setActualizandoId] = useState<number | null>(null);
+  const [actualizandoReservasId, setActualizandoReservasId] = useState<number | null>(null);
 
   const token = localStorage.getItem("token");
 
@@ -108,6 +110,46 @@ export default function AdminUsuarios() {
       );
     } finally {
       setActualizandoId(null);
+    }
+  }
+
+  async function cambiarDisponibilidadReservas(usuario: Usuario) {
+    setMensaje("");
+    setActualizandoReservasId(usuario.id);
+
+    try {
+      const res = await apiFetch(`/admin/barberos/${usuario.id}/reservas`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ acepta_reservas: !usuario.acepta_reservas }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.detail || "No se pudo actualizar al profesional");
+      }
+
+      setUsuarios((actuales) =>
+        actuales.map((u) =>
+          u.id === usuario.id
+            ? { ...u, acepta_reservas: !usuario.acepta_reservas }
+            : u,
+        ),
+      );
+      setMensaje(
+        usuario.acepta_reservas
+          ? `${usuario.nombre} quedó oculto de las reservas`
+          : `${usuario.nombre} volvió a estar disponible para reservas`,
+      );
+    } catch (error) {
+      setMensaje(
+        error instanceof Error ? error.message : "No se pudo actualizar al profesional",
+      );
+    } finally {
+      setActualizandoReservasId(null);
     }
   }
 
@@ -222,6 +264,7 @@ export default function AdminUsuarios() {
               <th>Email</th>
               <th>Rol</th>
               <th>Estado</th>
+              <th>Reservas</th>
               <th>Acción</th>
             </tr>
           </thead>
@@ -238,6 +281,15 @@ export default function AdminUsuarios() {
                   </span>
                 </td>
                 <td>
+                  {u.rol === "barbero" || u.rol === "admin" ? (
+                    <span className={`user-status ${u.acepta_reservas ? "active" : "inactive"}`}>
+                      {u.acepta_reservas ? "Disponible" : "Oculto"}
+                    </span>
+                  ) : (
+                    <span className="user-status-staff">—</span>
+                  )}
+                </td>
+                <td>
                   {u.rol === "cliente" ? (
                     <button
                       type="button"
@@ -252,7 +304,18 @@ export default function AdminUsuarios() {
                           : "Reactivar"}
                     </button>
                   ) : (
-                    <span className="user-status-staff">Personal</span>
+                    <button
+                      type="button"
+                      className={`user-status-button ${u.acepta_reservas ? "disable" : "enable"}`}
+                      disabled={actualizandoReservasId === u.id}
+                      onClick={() => cambiarDisponibilidadReservas(u)}
+                    >
+                      {actualizandoReservasId === u.id
+                        ? "Guardando..."
+                        : u.acepta_reservas
+                          ? "Ocultar de reservas"
+                          : "Habilitar reservas"}
+                    </button>
                   )}
                 </td>
               </tr>
