@@ -61,7 +61,7 @@ export default function AdminPanel() {
   const [turnoAEliminar, setTurnoAEliminar] = useState<Turno | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
 
-  const [diaActivo, setDiaActivo] = useState<string | null>(null);
+  const [diaActivo, setDiaActivo] = useState(fechaLocalISO());
 
   const [barberos, setBarberos] = useState<Barbero[]>([]);
   const [barberoActivo, setBarberoActivo] = useState<number | null>(null);
@@ -69,7 +69,7 @@ export default function AdminPanel() {
   const turnosDelDia = useMemo(() => {
     return [...turnos]
       .sort((a, b) => `${a.fecha}T${a.hora}`.localeCompare(`${b.fecha}T${b.hora}`))
-      .filter((t) => !diaActivo || t.fecha === diaActivo);
+      .filter((t) => t.fecha === diaActivo);
   }, [turnos, diaActivo]);
 
   const cargarTurnos = async () => {
@@ -118,14 +118,12 @@ export default function AdminPanel() {
         <div className="admin-day-nav">
           <button
             className="btn-secondary"
-            onClick={() => setDiaActivo(moverDiaISO(diaActivo ?? fechaLocalISO(), -1))}
+            onClick={() => setDiaActivo(moverDiaISO(diaActivo, -1))}
           >
             Día anterior
           </button>
 
-          <span className="admin-day-label">
-            {diaActivo ? isoToDMY(diaActivo) : "Todos los turnos"}
-          </span>
+          <span className="admin-day-label">{isoToDMY(diaActivo)}</span>
 
           <button
             className="btn-secondary"
@@ -134,13 +132,9 @@ export default function AdminPanel() {
             Hoy
           </button>
 
-          <button className="btn-secondary" onClick={() => setDiaActivo(null)}>
-            Ver todos
-          </button>
-
           <button
             className="btn-secondary"
-            onClick={() => setDiaActivo(moverDiaISO(diaActivo ?? fechaLocalISO(), 1))}
+            onClick={() => setDiaActivo(moverDiaISO(diaActivo, 1))}
           >
             Día siguiente
           </button>

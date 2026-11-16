@@ -87,7 +87,7 @@ export default function BarberoPanel({}: Props) {
     )}-${String(d.getDate()).padStart(2, "0")}`;
   };
 
-  const [fechaSeleccionada, setFechaSeleccionada] = useState<string | null>(null);
+  const [fechaSeleccionada, setFechaSeleccionada] = useState(hoyLocal());
   const token = localStorage.getItem("token");
 
   const fetchPanel = async () => {
@@ -152,7 +152,6 @@ export default function BarberoPanel({}: Props) {
   const turnosFiltrados = [...data.turnos]
     .sort((a, b) => `${a.fecha}T${a.hora}`.localeCompare(`${b.fecha}T${b.hora}`))
     .filter((t) => {
-      if (!fechaSeleccionada) return true;
       return t.fecha.split("T")[0] === fechaSeleccionada;
     });
 
@@ -164,7 +163,7 @@ export default function BarberoPanel({}: Props) {
   const barberoMes = data.ganancia_mensual;
   const adminMes = facturacionMes - barberoMes;
 
-  const esHoy = !fechaSeleccionada || fechaSeleccionada === hoyLocal();
+  const esHoy = fechaSeleccionada === hoyLocal();
 
   const graficoDia = [
     {
@@ -231,7 +230,7 @@ export default function BarberoPanel({}: Props) {
                 className="btn-secondary"
                 onClick={() =>
                   setFechaSeleccionada(
-                    moverDiaISO(fechaSeleccionada ?? hoyLocal(), -1),
+                    moverDiaISO(fechaSeleccionada, -1),
                   )
                 }
               >
@@ -239,7 +238,7 @@ export default function BarberoPanel({}: Props) {
               </button>
 
               <span className="admin-day-label">
-                {fechaSeleccionada ? isoToDMY(fechaSeleccionada) : "Todos los turnos"}
+                {isoToDMY(fechaSeleccionada)}
               </span>
 
               <button
@@ -251,16 +250,9 @@ export default function BarberoPanel({}: Props) {
 
               <button
                 className="btn-secondary"
-                onClick={() => setFechaSeleccionada(null)}
-              >
-                Ver todos
-              </button>
-
-              <button
-                className="btn-secondary"
                 onClick={() =>
                   setFechaSeleccionada(
-                    moverDiaISO(fechaSeleccionada ?? hoyLocal(), 1),
+                    moverDiaISO(fechaSeleccionada, 1),
                   )
                 }
               >
