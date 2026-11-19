@@ -3642,7 +3642,7 @@ body {
 }
 
 .mis-turnos-modal .modal-title::after {
-  content: "Consultá tus últimas reservas y administrá las próximas visitas";
+  content: "Consultá tus últimas 5 reservas. Si no podés asistir, cancelá tu próximo turno desde el botón rojo.";
   display: block;
   max-width: 440px;
   margin-top: 10px;
@@ -3758,25 +3758,32 @@ body {
 }
 
 .mis-turnos-modal .btn-cancel-form {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   align-self: center;
   justify-self: start;
-  min-height: 36px;
-  padding: 8px 13px;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: 7px;
-  background: rgba(239, 68, 68, 0.07);
-  color: #ff9c9c;
+  min-height: 44px;
+  padding: 10px 17px;
+  border: 1px solid #ff5b5b;
+  border-radius: 8px;
+  background: #c92828;
+  color: #fff;
   font-family: inherit;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+  box-shadow: 0 7px 18px rgba(201, 40, 40, 0.28);
 }
 
 .mis-turnos-modal .btn-cancel-form:hover {
-  transform: none;
-  border-color: rgba(239, 68, 68, 0.55);
-  background: rgba(239, 68, 68, 0.14);
-  color: #ffb4b4;
+  transform: translateY(-1px);
+  border-color: #ff8282;
+  background: #e13434;
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(201, 40, 40, 0.38);
 }
 
 .mis-turnos-modal > .btn-secondary {

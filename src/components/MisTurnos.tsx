@@ -60,13 +60,13 @@ export default function MisTurnos({ onClose }: { onClose: () => void }) {
     cargarTurnos();
   }, []);
 
-  const ultimosTresTurnos = [...turnos]
+  const ultimosCincoTurnos = [...turnos]
     .sort((a, b) => {
       const fechaA = new Date(`${a.fecha}T${a.hora}`);
       const fechaB = new Date(`${b.fecha}T${b.hora}`);
       return fechaB.getTime() - fechaA.getTime();
     })
-    .slice(0, 3);
+    .slice(0, 5);
   return (
     <div className="modal-form-overlay">
       <div className="modal-form-content admin-card mis-turnos-modal">
@@ -77,7 +77,7 @@ export default function MisTurnos({ onClose }: { onClose: () => void }) {
         )}
 
         <div className="turnos-form">
-          {ultimosTresTurnos.map((t) => (
+          {ultimosCincoTurnos.map((t) => (
             <div key={t.id} className="turno-form-card">
               <div>
                 <label>SERVICIO:</label>
@@ -103,7 +103,7 @@ export default function MisTurnos({ onClose }: { onClose: () => void }) {
                 className="btn-cancel-form"
                 onClick={() => cancelarTurno(t.id)}
               >
-                Cancelar turno
+                <span aria-hidden="true">✕</span> Cancelar este turno
               </button>
             </div>
           ))}
